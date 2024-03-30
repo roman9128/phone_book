@@ -66,7 +66,7 @@ def find_anything(contacts):
             print("___________")
     if flag == False:
         print("Ничего не нашлось")
-
+     
 def remove(contacts):
     clear()
     print("Введите порядковый номер контакта, который хотите удалить")

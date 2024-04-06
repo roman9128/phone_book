@@ -1,15 +1,9 @@
+from easygui import *
 import json
-from os import system, name
-
-def clear():
-	if name == 'nt':
-		_ = system('cls')
 
 def save():
     with open("contacts.json", "w", encoding = "utf-8") as contact:
         contact.write(json.dumps(contacts, ensure_ascii = False))
-    clear()
-    print("Cохранение файла успешно")
 
 def load_contacts():
     try:
@@ -31,7 +25,7 @@ def load_contacts():
         "phone number": "78904563",
         "additional phone number": "",
         "birthday": "02.02.2002",
-        "email": "name1@email.internet"
+        "email": "name2@email.internet"
         },
         {
         "name": "Юра",
@@ -45,144 +39,242 @@ def load_contacts():
     return contacts
 
 def show(contacts):
-    clear()
-    for i in contacts:
-        for k, v in i.items():
-            print("{0}: {1}".format(k, v))
-        print("___________")
+    if len(contacts) == 0:
+        title_for_notification = "Уведомление"
+        message_for_notification = "Справочник пуст"
+        button = "Ладно"
+        msgbox(message_for_notification, title_for_notification, button)        
+    elif len(contacts) == 1:
+        msg_for_bbox = f"\
+        Имя: {contacts[0]["name"]}\n\
+        Фамилия: {contacts[0]["surname"]}\n\
+        Номер телефона: {contacts[0]["phone number"]}\n\
+        Дополнительный номер телефона: {contacts[0]["additional phone number"]}\n\
+        Дата рождения: {contacts[0]["birthday"]}\n\
+        email: {contacts[0]["email"]}\n"
+        title_for_bbox = "Информация о контакте"
+        choices_for_bbox = ["Изменить контакт", "Удалить контакт", "Выйти в главное меню"]
+        user_choice_in_bbox = buttonbox(msg_for_bbox, title_for_bbox, choices_for_bbox)
+        if user_choice_in_bbox == choices_for_bbox[0]:
+            change(contacts, contacts[0])
+        if user_choice_in_bbox == choices_for_bbox[1]:
+            remove(contacts, contacts[0])
+        if user_choice_in_bbox == choices_for_bbox[2]:
+            return
+    else:
+        try:
+            choices_of_contacts = []
+            for i in contacts:
+                choices_of_contacts.append(i["name"] + " " + i["surname"])
+            title = "Телефонный справочник"
+            msg = "Выберите контакт для получения дополнительной информации"
+            user_choice = choicebox(msg, title, choices_of_contacts)
+            msg_for_bbox = f"\
+        Имя: {contacts[choices_of_contacts.index(user_choice)]["name"]}\n\
+        Фамилия: {contacts[choices_of_contacts.index(user_choice)]["surname"]}\n\
+        Номер телефона: {contacts[choices_of_contacts.index(user_choice)]["phone number"]}\n\
+        Дополнительный номер телефона: {contacts[choices_of_contacts.index(user_choice)]["additional phone number"]}\n\
+        Дата рождения: {contacts[choices_of_contacts.index(user_choice)]["birthday"]}\n\
+        email: {contacts[choices_of_contacts.index(user_choice)]["email"]}\n"
+            title_for_bbox = "Информация о контакте"
+            choices_for_bbox = ["Изменить контакт", "Удалить контакт", "Назад", "Выйти в главное меню"]
+            if user_choice:
+                user_choice_in_bbox = buttonbox(msg_for_bbox, title_for_bbox, choices_for_bbox)
+                if user_choice_in_bbox == choices_for_bbox[0]:
+                    change(contacts, contacts[choices_of_contacts.index(user_choice)])
+                if user_choice_in_bbox == choices_for_bbox[1]:
+                    remove(contacts, contacts[choices_of_contacts.index(user_choice)])
+                if user_choice_in_bbox == choices_for_bbox[2]:
+                    show(contacts)
+                if user_choice_in_bbox == choices_for_bbox[3]:
+                    return
+        except:
+            return
+
+def show_for_search(contacts, found_contacts):     
+    if len(found_contacts) == 1:
+        msg_for_bbox = f"\
+        Имя: {found_contacts[0]["name"]}\n\
+        Фамилия: {found_contacts[0]["surname"]}\n\
+        Номер телефона: {found_contacts[0]["phone number"]}\n\
+        Дополнительный номер телефона: {found_contacts[0]["additional phone number"]}\n\
+        Дата рождения: {found_contacts[0]["birthday"]}\n\
+        email: {found_contacts[0]["email"]}\n"
+        title_for_bbox = "Результаты поиска"
+        choices_for_bbox = ["Изменить контакт", "Удалить контакт", "Выйти в главное меню"]
+        user_choice_in_bbox = buttonbox(msg_for_bbox, title_for_bbox, choices_for_bbox)
+        if user_choice_in_bbox == choices_for_bbox[0]:
+            change(contacts, contacts[contacts.index(found_contacts[0])])
+        if user_choice_in_bbox == choices_for_bbox[1]:
+            remove(contacts, contacts[contacts.index(found_contacts[0])])
+        if user_choice_in_bbox == choices_for_bbox[2]:
+            return
+    else:
+        try:
+            choices_of_contacts = []
+            for i in found_contacts:
+                choices_of_contacts.append(i["name"] + " " + i["surname"])
+            title = "Результаты поиска"
+            msg = "Выберите контакт для получения дополнительной информации"
+            user_choice = choicebox(msg, title, choices_of_contacts)
+            msg_for_bbox = f"\
+        Имя: {found_contacts[choices_of_contacts.index(user_choice)]["name"]}\n\
+        Фамилия: {found_contacts[choices_of_contacts.index(user_choice)]["surname"]}\n\
+        Номер телефона: {found_contacts[choices_of_contacts.index(user_choice)]["phone number"]}\n\
+        Дополнительный номер телефона: {found_contacts[choices_of_contacts.index(user_choice)]["additional phone number"]}\n\
+        Дата рождения: {found_contacts[choices_of_contacts.index(user_choice)]["birthday"]}\n\
+        email: {found_contacts[choices_of_contacts.index(user_choice)]["email"]}\n"
+            title_for_bbox = "Информация о контакте"
+            choices_for_bbox = ["Изменить контакт", "Удалить контакт", "Назад", "Выйти в главное меню"]
+            if user_choice:
+                user_choice_in_bbox = buttonbox(msg_for_bbox, title_for_bbox, choices_for_bbox)
+                if user_choice_in_bbox == choices_for_bbox[0]:
+                    change(contacts, contacts[contacts.index(found_contacts[choices_of_contacts.index(user_choice)])])
+                if user_choice_in_bbox == choices_for_bbox[1]:
+                    remove(contacts, contacts[contacts.index(found_contacts[choices_of_contacts.index(user_choice)])])
+                if user_choice_in_bbox == choices_for_bbox[2]:
+                    show_for_search(contacts, found_contacts)
+                if user_choice_in_bbox == choices_for_bbox[3]:
+                    return
+        except:
+            return
 
 def find_anything(contacts):
-    clear()
-    smth = input("Что ищем (введите имя, фамилию, номер телефона, дату рождения или e-mail)? ")
-    if smth == "":
-        print("Вы ничего не ввели")
+    try:
+        msg_for_ebox = "Что ищем (введите имя, фамилию, номер телефона, дату рождения или e-mail)?"
+        title_for_ebox = "Поиск"
+        smth = enterbox(msg_for_ebox, title_for_ebox)
+        while True:
+            errmsg = ""
+            if smth == "":
+                errmsg = "Вы ничего не ввели"
+            if errmsg == "":
+                break
+            smth = enterbox(errmsg, title_for_ebox)
+        found_contacts = []
+        for i in contacts:
+            if smth.casefold() in i["name"].casefold() or smth.casefold() in i["surname"].casefold() or smth.casefold() in i["email"].casefold() or smth in i["phone number"] or smth in i["additional phone number"] or smth in i["birthday"]:
+                found_contacts.append(i)
+        if len(found_contacts) == 0:
+            title_for_notification = "Уведомление"
+            message_for_notification = "Ничего не нашлось"
+            button = "Ну ладно"
+            msgbox(message_for_notification, title_for_notification, button)
+        else:
+            show_for_search(contacts, found_contacts)
+    except:
         return
-    flag = False
-    for i in contacts:
-        if smth.casefold() in i["name"].casefold() or smth.casefold() in i["surname"].casefold() or smth.casefold() in i["email"].casefold() or smth in i["phone number"] or smth in i["additional phone number"] or smth in i["birthday"]:
-            flag = True
-            for k, v in i.items():
-                print(f"{k}: {v}")
-            print("___________")
-    if flag == False:
-        print("Ничего не нашлось")
-     
-def remove(contacts):
-    clear()
-    print("Введите порядковый номер контакта, который хотите удалить")
-    for i in range(len(contacts)):
-        print(f"{i + 1} - {contacts[i]["name"]} {contacts[i]["surname"]}")
-    print("Чтобы выйти в меню, введите 0")
-    while True:
-        try:
-            choice = int(input())
-            if choice == 0:
-                break
-            elif choice > 0 and choice <= len(contacts):
-                print(f"Контакт {contacts[choice - 1]["name"]} {contacts[choice - 1]["surname"]} удалён")
-                del contacts[choice - 1]
-                break
-            else:
-                print("Что-то не то ввели, попробуйте ещё раз")   
-        except:
-            print("Что-то не то ввели, попробуйте ещё раз")
-    return contacts
+
+def remove(contacts, contact_to_remove):
+    message = f"Хотите удалить контакт {contact_to_remove["name"]} {contact_to_remove["surname"]}?"
+    title = "Удаление контакта"
+    choices = ["Да, удаляю", "Нет, пусть останется"]
+    choice = buttonbox(message, title, choices)
+    if choice == choices[0]:
+        title = "Уведомление"
+        message = f"Контакт {contact_to_remove["name"]} {contact_to_remove["surname"]} удалён"
+        button = "Хорошо"
+        msgbox(message, title, button)
+        del contacts[contacts.index(contact_to_remove)]
+        save()
+        return contacts
+    else:
+        return contacts
 
 def add(contacts):
-    clear()
-    new_contact = { 
-        "name": "",
-        "surname": "",
-        "phone number": "",
-        "additional phone number": "",
-        "birthday": "",
-        "email": ""
-        }
-    new_contact["name"] = input("Введите имя: ")
-    new_contact["surname"] = input("Введите фамилию: ")
-    new_contact["phone number"] = input("Введите номер телефона: ")
-    new_contact["additional phone number"] = input("Введите дополнительный номер телефона: ")
-    new_contact["birthday"] = input("Введите дату рождения: ")
-    new_contact["email"] = input("Введите e-mail: ")
-    contacts.append(new_contact)
-    print("Контакт добавлен")
+    try:
+        new_contact = { 
+            "name": "",
+            "surname": "",
+            "phone number": "",
+            "additional phone number": "",
+            "birthday": "",
+            "email": ""
+            }
+        msg = "Введите информацию о контакте"
+        title = "Добавляем контакт"
+        fieldNames = ["Имя", "Фамилия", "Номер телефона", "Дополнительный номер телефона", "Дата рождения", "Email"]
+        fieldValues = multenterbox(msg, title, fieldNames)
+        while True:
+            errmsg = ""
+            if fieldValues[0] == "":
+                errmsg += "Давайте хотя бы введём имя\n"
+            if fieldValues[2] != "":
+                if fieldValues[2].isdigit() == False:
+                    errmsg += "Номер телефона следует написать цифрами\n"
+            if fieldValues[3] != "":
+                if fieldValues[3].isdigit() == False:
+                    errmsg += "Дополнительный номер телефона следует написать цифрами"
+            if errmsg == "":
+                break
+            fieldValues = multenterbox(errmsg, title, fieldNames, fieldValues)
+        new_contact["name"] = fieldValues[0]
+        new_contact["surname"] = fieldValues[1]
+        new_contact["phone number"] = fieldValues[2]
+        new_contact["additional phone number"] = fieldValues[3]
+        new_contact["birthday"] = fieldValues[4]
+        new_contact["email"] = fieldValues[5]
+        contacts.append(new_contact)
+        save()
+        title = "Уведомление"
+        message = "Контакт добавлен"
+        button = "Хорошо"
+        msgbox(message, title, button)
+        return contacts
+    except:
+        return
+
+def change(contacts, contact_to_change):
+    values_to_change = list(map(lambda x: x, contact_to_change.values()))
+    msg = "Заполните поля"
+    title = "Изменяем информацию о контакте"
+    fieldNames = ["Имя", "Фамилия", "Номер телефона", "Дополнительный номер телефона", "Дата рождения", "Email"]
+    fieldValues = multenterbox(msg, title, fieldNames, values_to_change)
+    while True:
+        errmsg = ""
+        if fieldValues[0] == "":
+            errmsg += "Давайте хотя бы введём имя\n"
+        if fieldValues[2] != "":
+            if fieldValues[2].isdigit() == False:
+                errmsg += "Номер телефона следует написать цифрами\n"
+        if fieldValues[3] != "":
+            if fieldValues[3].isdigit() == False:
+                errmsg += "Дополнительный номер телефона следует написать цифрами"
+        if errmsg == "":
+            break
+        fieldValues = multenterbox(errmsg, title, fieldNames, fieldValues)
+    contacts[contacts.index(contact_to_change)]["name"] = fieldValues[0]
+    contacts[contacts.index(contact_to_change)]["surname"] = fieldValues[1]
+    contacts[contacts.index(contact_to_change)]["phone number"] = fieldValues[2]
+    contacts[contacts.index(contact_to_change)]["additional phone number"] = fieldValues[3]
+    contacts[contacts.index(contact_to_change)]["birthday"] = fieldValues[4]
+    contacts[contacts.index(contact_to_change)]["email"] = fieldValues[5]
+    save()
+    title = "Уведомление"
+    message = "Наверное, Вы что-то изменили"
+    button = "Возможно"
+    msgbox(message, title, button)
     return contacts
 
-def change(contacts):
-    clear()
-    print("Введите порядковый номер контакта, который хотите изменить")
-    for i in range(len(contacts)):
-        print(f"{i + 1} - {contacts[i]["name"]} {contacts[i]["surname"]}")
-    print("Чтобы выйти в меню, введите 0")
+def main_menu():
     while True:
-        try:
-            choice = int(input())
-            if choice == 0:
-                break
-            elif choice > 0 and choice <= len(contacts):
-                print(f"Вы выбрали контакт {contacts[choice - 1]["name"]} {contacts[choice - 1]["surname"]}")
-                new_name = input("Введите имя: ")
-                if new_name == "":
-                    print("Не изменено")
-                else:
-                    contacts[choice - 1]["name"] = new_name
-                new_surname = input("Введите фамилию: ")
-                if new_surname == "":
-                    print("Не изменено")
-                else:
-                    contacts[choice - 1]["surname"] = new_surname
-                new_phone_number = input("Введите номер телефона: ")
-                if new_phone_number == "":
-                    print("Не изменено")
-                else:
-                    contacts[choice - 1]["phone number"] = new_phone_number
-                new_additional_phone_number = input("Введите дополнительный номер телефона: ")
-                if new_additional_phone_number == "":
-                    print("Не изменено")
-                else:
-                    contacts[choice - 1]["additional phone number"] = new_additional_phone_number
-                new_birthday = input("Введите дату рождения: ")
-                if new_birthday == "":
-                    print("Не изменено")
-                else:
-                    contacts[choice - 1]["birthday"] = new_birthday
-                new_email = input("Введите e-mail: ")
-                if new_email == "":
-                    print("Не изменено")
-                else:
-                    contacts[choice - 1]["email"] = new_email
-                break
-            else:
-                print("Что-то не то ввели, попробуйте ещё раз")   
-        except:
-            print("Что-то не то ввели, попробуйте ещё раз")
-    return contacts
+        title = "Телефонный справочник"
+        msg = "Выберите действие"
+        choices = ["Посмотреть справочник", "Найти контакт", "Добавить контакт", "Сохранить и выйти"]
+        user_choice = buttonbox(msg, title, choices)
+        if user_choice == choices[0]:
+            show(contacts)
+        if user_choice == choices[1]:
+            find_anything(contacts)
+        if user_choice == choices[2]:
+            add(contacts)
+        if user_choice == choices[3]:
+            save()
+            title = "Уведомление"
+            message = "Увидимся"
+            button = "Чао"
+            msgbox(message, title, button)
+            break
 
 contacts = load_contacts()
-
-while True:
-    user_choice = input("\
-            Введите символ, чтобы выбрать действие:\n\
-            1 - Посмотреть справочник\n\
-            2 - Найти контакт\n\
-            3 - Добавить контакт\n\
-            4 - Изменить контакт\n\
-            5 - Удалить контакт\n\
-            Чтобы выйти, введите любой иной символ\n")
-    if user_choice == "1":
-        show(contacts)
-    elif user_choice == "2":
-        find_anything(contacts)
-    elif user_choice == "3":
-        add(contacts)
-        save()
-    elif user_choice == "4":
-        change(contacts)
-        save()
-    elif user_choice == "5":
-        remove(contacts)
-        save()
-    else:
-        save()
-        print("Увидимся")
-        break
+main_menu()

@@ -225,36 +225,39 @@ def add(contacts):
         return
 
 def change(contacts, contact_to_change):
-    values_to_change = list(map(lambda x: x, contact_to_change.values()))
-    msg = "Заполните поля"
-    title = "Изменяем информацию о контакте"
-    fieldNames = ["Имя", "Фамилия", "Номер телефона", "Дополнительный номер телефона", "Дата рождения", "Email"]
-    fieldValues = multenterbox(msg, title, fieldNames, values_to_change)
-    while True:
-        errmsg = ""
-        if fieldValues[0] == "":
-            errmsg += "Давайте хотя бы введём имя\n"
-        if fieldValues[2] != "":
-            if fieldValues[2].isdigit() == False:
-                errmsg += "Номер телефона следует написать цифрами\n"
-        if fieldValues[3] != "":
-            if fieldValues[3].isdigit() == False:
-                errmsg += "Дополнительный номер телефона следует написать цифрами"
-        if errmsg == "":
-            break
-        fieldValues = multenterbox(errmsg, title, fieldNames, fieldValues)
-    contacts[contacts.index(contact_to_change)]["name"] = fieldValues[0]
-    contacts[contacts.index(contact_to_change)]["surname"] = fieldValues[1]
-    contacts[contacts.index(contact_to_change)]["phone number"] = fieldValues[2]
-    contacts[contacts.index(contact_to_change)]["additional phone number"] = fieldValues[3]
-    contacts[contacts.index(contact_to_change)]["birthday"] = fieldValues[4]
-    contacts[contacts.index(contact_to_change)]["email"] = fieldValues[5]
-    save()
-    title = "Уведомление"
-    message = "Наверное, Вы что-то изменили"
-    button = "Возможно"
-    msgbox(message, title, button)
-    return contacts
+    try:
+        values_to_change = list(map(lambda x: x, contact_to_change.values()))
+        msg = "Заполните поля"
+        title = "Изменяем информацию о контакте"
+        fieldNames = ["Имя", "Фамилия", "Номер телефона", "Дополнительный номер телефона", "Дата рождения", "Email"]
+        fieldValues = multenterbox(msg, title, fieldNames, values_to_change)
+        while True:
+            errmsg = ""
+            if fieldValues[0] == "":
+                errmsg += "Давайте хотя бы введём имя\n"
+            if fieldValues[2] != "":
+                if fieldValues[2].isdigit() == False:
+                    errmsg += "Номер телефона следует написать цифрами\n"
+            if fieldValues[3] != "":
+                if fieldValues[3].isdigit() == False:
+                    errmsg += "Дополнительный номер телефона следует написать цифрами"
+            if errmsg == "":
+                break
+            fieldValues = multenterbox(errmsg, title, fieldNames, fieldValues)
+        contacts[contacts.index(contact_to_change)]["name"] = fieldValues[0]
+        contacts[contacts.index(contact_to_change)]["surname"] = fieldValues[1]
+        contacts[contacts.index(contact_to_change)]["phone number"] = fieldValues[2]
+        contacts[contacts.index(contact_to_change)]["additional phone number"] = fieldValues[3]
+        contacts[contacts.index(contact_to_change)]["birthday"] = fieldValues[4]
+        contacts[contacts.index(contact_to_change)]["email"] = fieldValues[5]
+        save()
+        title = "Уведомление"
+        message = "Наверное, Вы что-то изменили"
+        button = "Возможно"
+        msgbox(message, title, button)
+        return contacts
+    except:
+        return contacts
 
 def main_menu():
     while True:
